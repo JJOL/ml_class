@@ -371,12 +371,10 @@ class NeuralNet:
 
 			step += 1
 
+			tSuccCount = 0.0
 			trainErrorAcum = 0
-
 			self.shuffle(trainSet, ys)
-
 			batches = self.gen_batches(trainSet, ys, batch_size)
-
 			for batch in batches:
 				# print "Testing with X"
 				# print trainSet[i]
@@ -386,10 +384,15 @@ class NeuralNet:
 
 					pred = self.forward(batch[0][i])
 					error = 0
+					flawless = 1
 					for j in xrange(len(pred)):
 						error += math.pow(pred[j]-batch[1][i][j], 2)
+						if (pred[j] >= 0.5 and batch[1][i][j] < 0.5) or (pred[j] < 0.5 and batch[1][i][j] >= 0.5):
+							flawless = 0
 
 					trainErrorAcum += error
+					if flawless:
+						tSuccCount += 1
 
 					sampGrad = self.BP(batch[0][i], batch[1][i], self.aneurons, self.neurons)
 
@@ -403,29 +406,57 @@ class NeuralNet:
 
 				# print "Total Gradient"
 				# print grads
-
 			trainErrorAcum /= len(trainSet)
 			trainErrors.append(trainErrorAcum)
 
 
+
+			vSuccCount = 0.0
 			validErrorAcum = 0
+			tp = 0
+			tn = 0
+			fp = 0
+			fn = 0
 			for i in xrange(len(validSet)):
 				valdata = validSet[i]
 				pred = self.forward(valdata)
 				error = 0
+				flawless = 1
 				for j in xrange(len(pred)):
 					error += math.pow(pred[j]-validYs[i][j], 2)
+					if (pred[j] >= 0.5 and validYs[i][j] >= 0.5):
+						vSuccCount += 1
+						tp += 1
+					elif (pred[j] < 0.5 and validYs[i][j] < 0.5):
+						vSuccCount += 1
+						tn += 1
+					elif (pred[j] >= 0.5 and validYs[i][j] < 0.5):
+						fp += 1
+					else:
+						fn += 1
 				validErrorAcum += error
+				#if flawless:
+				#	vSuccCount += 1
 
 			validErrorAcum /= len(validSet)
 			validErrors.append(validErrorAcum)
 
 			
 
-			
+			tAcc = tSuccCount / len(trainSet)
+			vAcc = vSuccCount / len(validSet)
 
 			print "Epoch #" + str(step) + " - Train Error: " + str(trainErrorAcum) + " - Valid Error: " + str(validErrorAcum)
+			print "Epoch #" + str(step) + " - Train Accuracy: " + str(tAcc)
+			print "Epoch #" + str(step) + " - Valid Accuracy: " + str(vAcc)
 
+			if e == epochs-1:
+				print "      T      F"
+				print "   ---------------"
+				print "P1 |  " + str(tp) + "  |  " + str(fp) + "  |"
+				print "   ---------------"
+				print "P0 |  " + str(fn) + "  |  " + str(tn) + "  |"
+				print "   ---------------"
 
 			if (validErrorAcum <= tolerance):
 				break
