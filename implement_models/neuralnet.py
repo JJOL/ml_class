@@ -1,11 +1,9 @@
 """
 	Author: Juan Jose Olivera
-
 	Module: Vanilla-Really-Simple-And-Unoptimized-Neural Network
 	
 	Objective: To understand and implement a general neural network that is trained with
 			   backpropagation on training data, and that it can make predictions.
-
 	Overview: NeuralNet Class
 	 - NeuralNet(xDimension) Creates an Empty Neural Network with an input dimension of xDimension
 	 - addLayer(n) Adds a layer of n neurons all connected to the previous layer (or input).
@@ -384,7 +382,7 @@ class NeuralNet:
 				# print trainSet[i]
 				grads = self.emptyParamsCopy()
 
-				for i in xrange(len(batch)):
+				for i in xrange(len(batch[0])):
 
 					pred = self.forward(batch[0][i])
 					error = 0
@@ -439,17 +437,18 @@ class NeuralNet:
 	def train(self, gtype, testSet, ys, validSet, validYs, epochs, learnRate, tolerance=0.005):
 		if gtype=='b':
 			return self.BGD(testSet, ys, validSet, validYs, epochs, learnRate, tolerance)
-		else:
+		elif gtype=='m':
 			return self.MiniGD(testSet, ys, validSet, validYs, epochs, 50, learnRate, tolerance)
+		else:
+			print "Unknown Gradient Descent Option!"
+			return 0
 
 				
 
 
 """
 	SubModule: Samples Utility
-
 	Objective: Facilitate the generation, storage and loading of training samples for the Neural Networks
-
 	Overview:
 		Main Utility Funcitons:
 		 - saveSampels(fname, xs, ys) Saves the samples (xs, ys) into a file named "fname"
@@ -525,11 +524,10 @@ def makeGradSamples(n):
 
 
 
-def show_errorGraph(title, terr, verr):
+def show_errorGraph(title, (terr, verr)):
 	x_axis = range(1, len(terr)+1)
 	plt.plot(x_axis, terr, 'b', label='Training Error')
 	plt.plot(x_axis, verr, 'r', label='Validation Error')
 	plt.title(title)
 	plt.legend()
 	plt.show()
-
