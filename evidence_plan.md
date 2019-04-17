@@ -11,17 +11,18 @@ Competences target:
 Concepts Remaining:
 - Learning Rate
 - Classification
-- 1 hot encoding
-- batch            2.a) in MiniGD uses batches to proceed
+- Activation Funct  2.a) in NeuralNetwork we use the def sigmoid(x) implementatino as actfun
+- 1 hot encoding    2.c) in data_utils generated for titanic problem. Function 1hot-encoding
+- batch             2.a) in MiniGD uses batches to proceed
 - kernel
-- networks         2.a) has a complete structure of a nn of 'n' layers each with 'm' parameters
-- learning         2.a) Learning Diagrams of Minimizing Error
-- train set        2.a) NeuralNet.train recieves both training set and validation set for testing
-- valid set        2.a) ^^
+- networks          2.a) has a complete structure of a nn of 'n' layers each with 'm' parameters
+- learning          2.a) Learning Diagrams of Minimizing Error
+- train set         2.a) NeuralNet.train recieves both training set and validation set for testing
+- valid set         2.a) ^^
 - test  set
-- confusion mat
+- confusion mat     2.a)/2.c) Confunsion Matrix Generated after MiniBGD for Validation Data
 - variance
-- Accuracy 		   2.a) Accuracy for training and validation is calculated in MiniGD and BGD
+- Accuracy 		    2.a) Accuracy for training and validation is calculated in MiniGD and BGD
 - cross-validation
 - linearity non lin 
 
@@ -39,6 +40,7 @@ It does each epoch an accuracy and error check
 
 
 #! b) Implement RandomForest and Simple Logistic Regression
+Simple Logistics Regression Implemented for Titanic Problem and with 1500 number of epochs got 0.47 error while neural net got 0.14
 
 #! c) Resolve (Titanic) with NN & RandomForset & Logistic and compare results (Conf Matrix, Time, Etc)
 - Gives full evidence for competence 2.
