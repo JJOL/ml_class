@@ -106,6 +106,7 @@ class NeuralNet:
 
 		# self.neurons.append(np.array(layer))
 
+	# Activation Function Sigmoid
 	def sig(self, x):
 		return 1.0 / (1.0 + math.exp(-x))
 
@@ -360,7 +361,7 @@ class NeuralNet:
 		
 
 
-	def MiniGD(self, trainSet, ys, validSet, validYs, epochs, batch_size, learnRate, tolerance=0.005):
+	def MiniGD(self, trainSet, ys, validSet, validYs, epochs, batch_size, learnRate):
 		step = 0
 		validErrorAcum = 100
 
@@ -410,66 +411,79 @@ class NeuralNet:
 			trainErrors.append(trainErrorAcum)
 
 
-
-			vSuccCount = 0.0
-			validErrorAcum = 0
-			tp = 0
-			tn = 0
-			fp = 0
-			fn = 0
-			for i in xrange(len(validSet)):
-				valdata = validSet[i]
-				pred = self.forward(valdata)
-				error = 0
-				flawless = 1
-				for j in xrange(len(pred)):
-					error += math.pow(pred[j]-validYs[i][j], 2)
-					if (pred[j] >= 0.5 and validYs[i][j] >= 0.5):
-						vSuccCount += 1
-						tp += 1
-					elif (pred[j] < 0.5 and validYs[i][j] < 0.5):
-						vSuccCount += 1
-						tn += 1
-					elif (pred[j] >= 0.5 and validYs[i][j] < 0.5):
-						fp += 1
-					else:
-						fn += 1
-				validErrorAcum += error
-				#if flawless:
-				#	vSuccCount += 1
-
-			validErrorAcum /= len(validSet)
-			validErrors.append(validErrorAcum)
-
+			# Validation Evaluation
+			(tp,tn,fp,fn,vErrAcum) = self.evaluate(validSet, validYs)
+			validErrors.append(vErrAcum)
 			
 
 			tAcc = tSuccCount / len(trainSet)
-			vAcc = vSuccCount / len(validSet)
+			vAcc = (0.0 + tp + tn) / len(validSet)
 
 			print "Epoch #" + str(step) + " - Train Error: " + str(trainErrorAcum) + " - Valid Error: " + str(validErrorAcum)
-			print "Epoch #" + str(step) + " - Train Accuracy: " + str(tAcc)
-			print "Epoch #" + str(step) + " - Valid Accuracy: " + str(vAcc)
+			print "Epoch #" + str(step) + " - Train Accur: " + str(tAcc)           + " - Valid Accur: " + str(vAcc)
 
 			if e == epochs-1:
-				print "      T      F"
-				print "   ---------------"
-				print "P1 |  " + str(tp) + "  |  " + str(fp) + "  |"
-				print "   ---------------"
-				print "P0 |  " + str(fn) + "  |  " + str(tn) + "  |"
-				print "   ---------------"
-
-			if (validErrorAcum <= tolerance):
-				break
+				self.printLearningInfo('Validation', tp,tn,fp,fn,vErrAcum)
 
 		return (trainErrors, validErrors)
 
+	def printLearningInfo(self, title, tp,tn,fp,fn, err):
+		print "Learning Diagnosis - " + title
+		print ""
+		print "      T      F"
+		print "   ---------------"
+		print "P1 |  " + str(tp) + "  |  " + str(fp) + "  |"
+		print "   ---------------"
+		print "P0 |  " + str(fn) + "  |  " + str(tn) + "  |"
+		print "   ---------------"
+		print ""
+
+		acc = (0.0 + tp + tn) / (tp+tn+fp+fn)
+		print "Accuracy: " + str(acc)
+		print "Error: " + str(err)
+		prec = tp / (0.0 + tp + fp)
+		reca = tp / (0.0 + tp + fn)
+		f1   = (2.0*prec*reca) / (prec + reca)
+		print "Precision: " + str(prec)
+		print "Recall: " + str(reca)
+		print "F1 Score: " + str(f1)
+
+
+	def evaluate(self, testSet, testYs):
+		vSuccCount = 0.0
+		testErrorAcum = 0
+		tp = 0
+		tn = 0
+		fp = 0
+		fn = 0
+		for i in xrange(len(testSet)):
+			valdata = testSet[i]
+			pred = self.forward(valdata)
+			error = 0
+			for j in xrange(len(pred)):
+				error += math.pow(pred[j]-testYs[i][j], 2)
+				if (pred[j] >= 0.5 and testYs[i][j] >= 0.5):
+					vSuccCount += 1
+					tp += 1
+				elif (pred[j] < 0.5 and testYs[i][j] < 0.5):
+					vSuccCount += 1
+					tn += 1
+				elif (pred[j] >= 0.5 and testYs[i][j] < 0.5):
+					fp += 1
+				else:
+					fn += 1
+			testErrorAcum += error
+
+		testErrorAcum /= len(testSet)
+
+		return (tp,tn,fp,fn,testErrorAcum)
 
 
 	def train(self, gtype, testSet, ys, validSet, validYs, epochs, learnRate, tolerance=0.005):
 		if gtype=='b':
 			return self.BGD(testSet, ys, validSet, validYs, epochs, learnRate, tolerance)
 		elif gtype=='m':
-			return self.MiniGD(testSet, ys, validSet, validYs, epochs, 50, learnRate, tolerance)
+			return self.MiniGD(testSet, ys, validSet, validYs, epochs, 50, learnRate)
 		else:
 			print "Unknown Gradient Descent Option!"
 			return 0

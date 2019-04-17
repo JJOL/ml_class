@@ -23,4 +23,6 @@ nnet.addLayer(1)
 							   validXs.tolist(), validYs.tolist(), 
 							   1500, 0.2)
 
+nnet.save('titanic_net.net')
+
 nn.show_errorGraph('Neural Net', (terr, verr))
