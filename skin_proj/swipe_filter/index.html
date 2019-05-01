@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Swipe-Filter</title>
+	<style>
+		body {
+			text-align: center;
+		}
+		#swipe-container {
+			position: relative;
+			display: inline-block;
+			width: 40%;
+			height: 500px;
+		}
+
+		#img-container {
+			position: absolute;
+			right: 0;
+			left: 0;
+			top: 0;
+			height: 410px;
+			height: 85%;
+			background: lightblue;
+		}
+
+		#img-container img {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+		}
+
+		.opt-btn {
+			position: absolute;
+			bottom: 0;
+			width: 50%;
+			height: 90px;
+			height: 15%;
+			color: white;
+			font-size: 32px;
+			font-weight: bold;
+		}
+		.opt-btn:hover {
+			cursor: pointer;
+		}
+
+		#opt-yes {
+			background: darkgreen;
+			left: 0;
+		}
+		#opt-yes:hover {
+			background-color: green;
+		}
+		#opt-no {
+			background: darkred;
+			right: 0;
+		}
+		#opt-no:hover {
+			background-color: red;
+		}
+
+		@media screen and (max-width: 720px) {
+			#swipe-container {
+				width: 90%;
+				height: 100vh;
+			}
+		}
+	</style>
+</head>
+<body>
+	<h1>Swipe-Filter V1</h1>
+	<h4 id="sub-caption">/img/dsada/</h4>
+	<div id="swipe-container">
+		<div id="img-container">
+			<img id="image-el0">
+			<img id="image-el1">
+			<img id="image-el2">
+			<img id="image-el3">
+			<img id="image-el4">
+			<img id="image-el5">
+			<img id="image-el6">
+			<img id="image-el7">
+			<img id="image-el8">
+			<img id="image-el9">
+		</div>
+		<div class="opt-btn" id="opt-yes">YES</div>
+		<div class="opt-btn" id="opt-no">NO</div>
+	</div>
+
+	<script
+  src="https://code.jquery.com/jquery-3.4.0.min.js"
+  integrity="sha256-BJeo0qm959uMBGb65z40ejJYGSgR7REI4+CW1fNKwOg="
+  crossorigin="anonymous"></script>
+	<script>
+		$(document).ready(() => {
+
+			let subCount = 0;
+			let count = 0;
+
+			let maxSize = 10;
+			let imgNames = [];
+			let imgState = []
+			let currInd = 0;
+
+			let currInterval = [];
+			let loadIndex = 0;
+			let sendIndex = 0;
+
+			let loadBatchPointer = 0;
+			let sendBatchPointer = 0;
+
+
+			function loadBatch(a,b, cb) {
+				$.ajax({
+					url: '/loadimgs',
+					method: 'GET',
+					data: {
+						begin: a,
+						end: b
+					},
+					success: (resp) => {
+						if (resp.startsWith("Error")) {
+							console.log(resp);
+							return;
+						}
+
+						data = JSON.parse(resp);
+						for (let i=0; i < data.length; i++) {
+							imgNames[loadIndex] = data[i].iname;
+							imgState[loadIndex] = '1';
+							$('#image-el'+loadIndex).get(0)
+								.src = data[i].iurl;
+
+							loadIndex++;
+							loadIndex = loadIndex % maxSize;
+						}
+
+						if (cb) cb();		
+					}
+				});
+				
+			}
+
+			function sendBatch(a, b, cb) {
+
+				// Formate States into a String Format
+				let formatStr = '';
+				for (let i=0; i < 5; i++) {
+					formatStr += imgState[sendIndex];
+					if (i < 4) formatStr += '-';
+
+					sendIndex++;
+					sendIndex = sendIndex % maxSize;
+				}
+				 
+
+				$.ajax({
+					url: '/updateimgs',
+					method: 'POST',
+					data: {
+						begin: a,
+						end: b,
+						states: formatStr
+					},
+					success: (resp) => {
+						if (resp.startsWith("Error")) {
+							console.log(resp);
+							return;
+						}
+
+						if (cb) cb();
+					}
+				});
+			}
+
+			function display_hide(newInd,prevInd) {
+				console.log("Hidding: " + prevInd)
+				console.log("Displaying: " + newInd)
+
+				$('#image-el'+prevInd).css('visibility', 'hidden');
+				$('#image-el'+newInd).css('visibility', 'visible');
+
+				$('#sub-caption').html(imgNames[newInd] + ' - ' + count);
+			}
+
+			function check(state) {
+				imgState[currInd] = state ? '1' : '0';
+
+				let prevInd  = currInd;
+				currInd++;
+				currInd = currInd % maxSize;
+
+				display_hide(currInd, prevInd);
+
+				subCount++;
+				count++;
+				if (subCount == 5) {
+					subCount = 0;
+
+					console.log("Done With 5, getting next 5!")
+
+					sendBatch(sendBatchPointer, sendBatchPointer+5,
+					() => { 
+						sendBatchPointer += 5; 
+
+						// After Sending Batch, we Can load next one
+						loadBatch(loadBatchPointer, loadBatchPointer+5,
+						()=>{ loadBatchPointer += 5; });
+					});
+
+					
+				}
+			}
+
+			// Hide Every Image
+			for (let i=0; i < maxSize; i++) {
+				$('#image-el'+i).css('visibility', 'hidden');
+			}
+
+			// Initialize By Pending the First Two Interval Sets
+			loadBatch(loadBatchPointer, loadBatchPointer+5, () => {
+				loadBatchPointer += 5;
+
+
+				// Make First Visible
+				$('#image-el0').css('visibility', 'visible');
+
+				loadBatch(loadBatchPointer, loadBatchPointer+5,
+					() => { loadBatchPointer += 5; });	
+			});
+			
+
+			
+			
+			// Document Control Binding
+
+			// Buttons Click
+			$('.opt-btn').click(function(ev) {
+				let type = this.id;
+
+				if (type == 'opt-yes') {
+					check(true);
+				} else if (type == 'opt-no') {
+					check(false);
+				} else {
+					console.log("Error: Unknown Option Btn on $(.opt-btn).click()!");
+				}
+
+			});
+
+			// Page 'a'/'d' keys
+			$(document).on('keypress', (ev) => {
+				if (ev.keyCode == 100) { // d
+					check(false);
+				}
+
+				if (ev.keyCode == 97) { // a
+					check(true);
+				}
+			})
+
+		});
+	</script>
+</body>
+</html>
