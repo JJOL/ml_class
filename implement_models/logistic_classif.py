@@ -7,6 +7,10 @@ class LogisticClassifier():
 		self.createModel()
 
 	def save(self, fname):
+		fOut = open(fname, "w")
+		fOut.write(fname+"\n")
+		fOut.write(str(self.xDimens)+" ") # Write Input Dimension
+		
 		pass
 	def load(self, fname):
 		pass

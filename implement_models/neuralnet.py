@@ -374,7 +374,7 @@ class NeuralNet:
 
 			tSuccCount = 0.0
 			trainErrorAcum = 0
-			self.shuffle(trainSet, ys)
+			#self.shuffle(trainSet, ys)
 			batches = self.gen_batches(trainSet, ys, batch_size)
 			for batch in batches:
 				# print "Testing with X"

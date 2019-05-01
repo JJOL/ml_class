@@ -72,3 +72,12 @@ def splitData(xs,ys,n):
     validXs = xs[n:]
     validYs = ys[n:]
     return (trainXs, trainYs, validXs, validYs)
+
+
+
+def crossValidation(model,xs,ys,k):
+    for fold in folds:
+        
+
+
+
