@@ -1,0 +1,35 @@
+# Script for downloading image sets
+
+googleimagesdownload --keywords "herpes simple tipo 1" -i "HSV_1" -l 200 --chromedriver "/usr/local/bin/chromedriver"
+
+googleimagesdownload --keywords "herpes simple tipo 2" -i "HSV_2" -l 200 --chromedriver "/usr/local/bin/chromedriver"
+
+googleimagesdownload --keywords "Varicela Zoster" -i "Varicela_Zoster" -l 200 --chromedriver "/usr/local/bin/chromedriver"
+
+googleimagesdownload --keywords "hidradenitis supurativa" -i "Hidroademitis" -l 200 --chromedriver "/usr/local/bin/chromedriver"
+
+googleimagesdownload --keywords "dermatofitosis" -i "Tinias" -l 200 --chromedriver "/usr/local/bin/chromedriver"
+
+googleimagesdownload --keywords "Impetigo" -i "Impetigo" -l 200 --chromedriver "/usr/local/bin/chromedriver"
+
+googleimagesdownload --keywords "Hematoma" -i "Hematoma" -l 200 --chromedriver "/usr/local/bin/chromedriver"
+
+googleimagesdownload --keywords "Ectima" -i "Ectima" -l 200 --chromedriver "/usr/local/bin/chromedriver"
+
+googleimagesdownload --keywords "Vitiligo" -i "Vitiligo" -l 200 --chromedriver "/usr/local/bin/chromedriver"
+
+googleimagesdownload --keywords "Psoriasis" -i "Psoriasis" -l 200 --chromedriver "/usr/local/bin/chromedriver"
+
+googleimagesdownload --keywords "Celulitis" -i "Celulitis" -l 200 --chromedriver "/usr/local/bin/chromedriver"
+
+googleimagesdownload --keywords "Folliculitis" -i "Folliculitis" -l 200 --chromedriver "/usr/local/bin/chromedriver"
+
+googleimagesdownload --keywords "Dermatitis Seborreica" -i "Dermatitis_Seborreica" -l 200 --chromedriver "/usr/local/bin/chromedriver"
+
+
+
+source env/bin/activate
+deactive
+
+python imgs_renamer.py downloads/Celulitis
+python swipe_filter/main.py downloads/Celulitis
