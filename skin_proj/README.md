@@ -7,7 +7,7 @@ State of the Art:
 App DermaPhoto: Skin Disease Prediction 90%
 
 
-Diseases:
+## Diseases:
 
 Herpes:
 * Herpes Simple Type I **
@@ -28,16 +28,19 @@ Piodermias:
 * Celulitis **
 * Ectima *
 
+## Usage
 
-Main Input:
+### Main Input:
 An image of the affected zone
 
-Auxiliary Input:
+### Auxiliary Input:
 A vector of additional information
 - Topografía (Codo, Brazos, Torzo, Cuello, Etc.) <- Fácil
 - Morfologia (2 clusters, grande, irregular) <- Difícil
 - Sintomas   (Dolor, Comezon, Ardor, Calor, Secresión) <- Medio
 
+### Output
+A probability vector to extract the most probable disease class
 
 # Dependencies:
 - virtualenv
